@@ -48,3 +48,4 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "Gagal menghapus atlet." }, { status: 500 });
   }
 }
+

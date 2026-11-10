@@ -59,3 +59,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Gagal menambahkan atlet baru." }, { status: 500 });
   }
 }
+

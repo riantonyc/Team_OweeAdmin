@@ -32,3 +32,4 @@ export const KALBAR_CONTINGENTS = [
 ] as const;
 
 export type Contingent = (typeof KALBAR_CONTINGENTS)[number];
+

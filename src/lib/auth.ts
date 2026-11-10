@@ -33,3 +33,4 @@ export async function getSession(): Promise<SessionPayload | null> {
   if (!token) return null;
   return await verifySessionToken(token);
 }
+

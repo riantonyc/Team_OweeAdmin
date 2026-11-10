@@ -9,3 +9,4 @@ export async function POST() {
     return NextResponse.json({ error: "Gagal mereset data atlet." }, { status: 500 });
   }
 }
+

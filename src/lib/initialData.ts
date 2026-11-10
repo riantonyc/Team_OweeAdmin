@@ -70,3 +70,4 @@ export const INITIAL_ATHLETES: Athlete[] = [
   { id: 67, nama: "Yoriko Suryanata Maulana", kontingen: "Mempawah", kategori: "PUTRA", kelas: "KELAS 80+ KG", dob: "2003-06-12", temuan: "Ya", status: "Aktif", catatan: "Update Mempawah" },
   { id: 68, nama: "M. Feroz Alfarisy", kontingen: "Sambas", kategori: "PUTRA", kelas: "KELAS 80+ KG", dob: "1997-08-14", temuan: "Ya", status: "Aktif", catatan: "" }
 ];
+

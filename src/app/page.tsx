@@ -6,18 +6,23 @@ import KpiCards from "@/components/KpiCards";
 import TabDatabase from "@/components/TabDatabase";
 import TabBook1Classes from "@/components/TabBook1Classes";
 import TabMatrix from "@/components/TabMatrix";
+import TabBracket from "@/components/TabBracket";
+import TabMedals from "@/components/TabMedals";
 import BottomBar from "@/components/BottomBar";
 import ModalAthleteForm from "@/components/ModalAthleteForm";
 import ModalAthleteDetail from "@/components/ModalAthleteDetail";
 import ModalExcelExport from "@/components/ModalExcelExport";
+import ModalWeighInPrint from "@/components/ModalWeighInPrint";
 import { useToast } from "@/components/Toast";
 import { Athlete } from "@/lib/types";
-import { Database, BookOpen, Grid } from "lucide-react";
+import { Database, BookOpen, Grid, Dna, Trophy } from "lucide-react";
 
 export default function DashboardPage() {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState<"database" | "classes" | "matrix">("database");
+  const [currentTab, setCurrentTab] = useState<
+    "database" | "classes" | "matrix" | "bracket" | "medals"
+  >("database");
 
   // Modal states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -28,7 +33,7 @@ export default function DashboardPage() {
   const [detailAthlete, setDetailAthlete] = useState<Athlete | null>(null);
 
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
-  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState(false);
+  const [isWeighInModalOpen, setIsWeighInModalOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -55,7 +60,6 @@ export default function DashboardPage() {
   const handleSaveAthlete = async (athleteData: Partial<Athlete>) => {
     try {
       if (editingAthlete) {
-        // Update existing
         const res = await fetch(`/api/athletes/${editingAthlete.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -69,7 +73,6 @@ export default function DashboardPage() {
           showToast(`Data atlet "${data.athlete.nama}" berhasil diperbarui!`, "success");
         }
       } else {
-        // Add new
         const res = await fetch("/api/athletes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -86,7 +89,7 @@ export default function DashboardPage() {
     }
   };
 
-  // Handler: Inline quick update (contingent, class, gender, status)
+  // Handler: Inline quick update
   const handleInlineUpdate = async (id: number, field: string, value: any) => {
     try {
       const res = await fetch(`/api/athletes/${id}`, {
@@ -183,6 +186,7 @@ export default function DashboardPage() {
       <Header
         onOpenAddModal={() => handleOpenAddModal()}
         onOpenExcelModal={() => setIsExcelModalOpen(true)}
+        onOpenWeighInModal={() => setIsWeighInModalOpen(true)}
         onResetData={handleResetToInitial}
       />
 
@@ -196,38 +200,62 @@ export default function DashboardPage() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setCurrentTab("database")}
-              className={`px-4 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
                 currentTab === "database"
                   ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
                   : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
               }`}
             >
               <Database className="w-4 h-4" />
-              <span>1. Database &amp; Form Edit Cepat</span>
+              <span>1. Database Atlet</span>
             </button>
 
             <button
               onClick={() => setCurrentTab("classes")}
-              className={`px-4 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
                 currentTab === "classes"
                   ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
                   : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span>2. Tabel Per Kelas (Format Book1)</span>
+              <span>2. Tabel Per Kelas (Book1)</span>
             </button>
 
             <button
               onClick={() => setCurrentTab("matrix")}
-              className={`px-4 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
+              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
                 currentTab === "matrix"
                   ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
                   : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
               }`}
             >
               <Grid className="w-4 h-4" />
-              <span>3. Rekap Matriks Kontingen</span>
+              <span>3. Rekap Matriks</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab("bracket")}
+              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
+                currentTab === "bracket"
+                  ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
+                  : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
+              }`}
+            >
+              <Dna className="w-4 h-4" />
+              <span>4. Bagan Undian &amp; Turnamen</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentTab("medals")}
+              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
+                currentTab === "medals"
+                  ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
+                  : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
+              }`}
+            >
+              <Trophy className="w-4 h-4" />
+              <span>5. Klasemen Medali</span>
             </button>
           </div>
 
@@ -270,6 +298,10 @@ export default function DashboardPage() {
                 onSelectContingentFilter={handleSelectContingentFromMatrix}
               />
             )}
+
+            {currentTab === "bracket" && <TabBracket athletes={athletes} />}
+
+            {currentTab === "medals" && <TabMedals />}
           </>
         )}
       </main>
@@ -304,6 +336,12 @@ export default function DashboardPage() {
         isOpen={isExcelModalOpen}
         athletes={athletes}
         onClose={() => setIsExcelModalOpen(false)}
+      />
+
+      <ModalWeighInPrint
+        isOpen={isWeighInModalOpen}
+        athletes={athletes}
+        onClose={() => setIsWeighInModalOpen(false)}
       />
     </div>
   );

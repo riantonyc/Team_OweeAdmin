@@ -90,3 +90,4 @@ export default function KpiCards({ athletes }: KpiCardsProps) {
     </section>
   );
 }
+

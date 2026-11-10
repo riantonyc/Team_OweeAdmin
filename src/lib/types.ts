@@ -18,3 +18,4 @@ export interface KpiData {
   kontingenAktif: number;
   totalKelas: number;
 }
+
