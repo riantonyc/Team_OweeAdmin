@@ -33,12 +33,16 @@ export default function TabMatrix({
             Matriks Sebaran Atlet Aktif Per Kontingen &amp; Kelas Berat Badan
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Klik pada nama kontingen untuk langsung memfilter daftar atlet kontingen tersebut di Tabel Database.
+            💡 <span className="text-blue-400 font-semibold">Klik nama kontingen</span> di tabel matriks untuk langsung menyaring daftar atlet kontingen tersebut di Database.
           </p>
         </div>
       </div>
 
       <div className="bg-slateCard border border-slateBorder rounded-xl overflow-hidden shadow-xl">
+        <div className="sm:hidden px-3 py-1.5 bg-slateElevated/60 border-b border-slateBorder text-[11px] text-slate-400 flex items-center justify-between">
+          <span>Matriks Kontingen</span>
+          <span className="text-blue-400 font-medium">👉 Geser untuk melihat semua kontingen</span>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse tabular-nums text-xs sm:text-sm">
             <thead>
@@ -51,8 +55,8 @@ export default function TabMatrix({
                   <th key={k} className="py-3 px-2.5 text-center">
                     <button
                       onClick={() => onSelectContingentFilter(k)}
-                      className="hover:text-blue-400 underline decoration-dotted cursor-pointer font-bold"
-                      title={`Klik untuk filter ${k}`}
+                      className="px-2 py-1 rounded bg-slateCard hover:bg-byonBlue hover:text-white border border-slateBorder text-slate-200 transition-all cursor-pointer font-bold whitespace-nowrap text-[11px]"
+                      title={`Klik untuk memfilter kontingen ${k}`}
                     >
                       {k}
                     </button>
@@ -90,7 +94,17 @@ export default function TabMatrix({
                               : "text-slate-600"
                           }`}
                         >
-                          {count}
+                          {count > 0 ? (
+                            <button
+                              onClick={() => onSelectContingentFilter(k)}
+                              className="hover:underline hover:text-blue-300 cursor-pointer font-bold"
+                              title={`Lihat atlet ${k}`}
+                            >
+                              {count}
+                            </button>
+                          ) : (
+                            0
+                          )}
                         </td>
                       );
                     })}
@@ -113,7 +127,13 @@ export default function TabMatrix({
                       key={k}
                       className="py-3.5 px-2.5 text-center font-mono text-amber-300"
                     >
-                      {kTotal}
+                      <button
+                        onClick={() => onSelectContingentFilter(k)}
+                        className="hover:underline hover:text-white cursor-pointer font-bold px-1 py-0.5 rounded"
+                        title={`Klik untuk filter semua atlet ${k}`}
+                      >
+                        {kTotal}
+                      </button>
                     </td>
                   );
                 })}
@@ -125,4 +145,3 @@ export default function TabMatrix({
     </section>
   );
 }
-

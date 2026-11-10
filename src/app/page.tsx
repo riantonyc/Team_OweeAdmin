@@ -6,23 +6,19 @@ import KpiCards from "@/components/KpiCards";
 import TabDatabase from "@/components/TabDatabase";
 import TabBook1Classes from "@/components/TabBook1Classes";
 import TabMatrix from "@/components/TabMatrix";
-import TabBracket from "@/components/TabBracket";
-import TabMedals from "@/components/TabMedals";
 import BottomBar from "@/components/BottomBar";
 import ModalAthleteForm from "@/components/ModalAthleteForm";
 import ModalAthleteDetail from "@/components/ModalAthleteDetail";
 import ModalExcelExport from "@/components/ModalExcelExport";
-import ModalWeighInPrint from "@/components/ModalWeighInPrint";
 import { useToast } from "@/components/Toast";
 import { Athlete } from "@/lib/types";
-import { Database, BookOpen, Grid, Dna, Trophy } from "lucide-react";
+import { Database, BookOpen, Grid } from "lucide-react";
 
 export default function DashboardPage() {
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState<
-    "database" | "classes" | "matrix" | "bracket" | "medals"
-  >("database");
+  const [currentTab, setCurrentTab] = useState<"database" | "classes" | "matrix">("database");
+  const [selectedContingent, setSelectedContingent] = useState("ALL");
 
   // Modal states
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -33,7 +29,6 @@ export default function DashboardPage() {
   const [detailAthlete, setDetailAthlete] = useState<Athlete | null>(null);
 
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
-  const [isWeighInModalOpen, setIsWeighInModalOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -176,8 +171,9 @@ export default function DashboardPage() {
   };
 
   const handleSelectContingentFromMatrix = (kontingen: string) => {
+    setSelectedContingent(kontingen);
     setCurrentTab("database");
-    showToast(`Menampilkan atlet kontingen ${kontingen}`, "info");
+    showToast(`Memfilter daftar atlet kontingen ${kontingen}`, "info");
   };
 
   return (
@@ -186,7 +182,6 @@ export default function DashboardPage() {
       <Header
         onOpenAddModal={() => handleOpenAddModal()}
         onOpenExcelModal={() => setIsExcelModalOpen(true)}
-        onOpenWeighInModal={() => setIsWeighInModalOpen(true)}
         onResetData={handleResetToInitial}
       />
 
@@ -233,30 +228,6 @@ export default function DashboardPage() {
               <Grid className="w-4 h-4" />
               <span>3. Rekap Matriks</span>
             </button>
-
-            <button
-              onClick={() => setCurrentTab("bracket")}
-              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
-                currentTab === "bracket"
-                  ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
-                  : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
-              }`}
-            >
-              <Dna className="w-4 h-4" />
-              <span>4. Bagan Undian &amp; Turnamen</span>
-            </button>
-
-            <button
-              onClick={() => setCurrentTab("medals")}
-              className={`px-3.5 py-2.5 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer ${
-                currentTab === "medals"
-                  ? "bg-byonBlue text-white shadow-md shadow-blue-600/20"
-                  : "bg-slateCard hover:bg-slateElevated text-slate-300 border border-slateBorder"
-              }`}
-            >
-              <Trophy className="w-4 h-4" />
-              <span>5. Klasemen Medali</span>
-            </button>
           </div>
 
           <div className="text-xs text-slate-400 flex items-center gap-2">
@@ -276,6 +247,8 @@ export default function DashboardPage() {
             {currentTab === "database" && (
               <TabDatabase
                 athletes={athletes}
+                contingentFilter={selectedContingent}
+                onContingentFilterChange={setSelectedContingent}
                 onOpenDetail={handleOpenDetailModal}
                 onOpenEdit={handleOpenEditModal}
                 onDelete={handleDeleteAthlete}
@@ -298,10 +271,6 @@ export default function DashboardPage() {
                 onSelectContingentFilter={handleSelectContingentFromMatrix}
               />
             )}
-
-            {currentTab === "bracket" && <TabBracket athletes={athletes} />}
-
-            {currentTab === "medals" && <TabMedals />}
           </>
         )}
       </main>
@@ -336,12 +305,6 @@ export default function DashboardPage() {
         isOpen={isExcelModalOpen}
         athletes={athletes}
         onClose={() => setIsExcelModalOpen(false)}
-      />
-
-      <ModalWeighInPrint
-        isOpen={isWeighInModalOpen}
-        athletes={athletes}
-        onClose={() => setIsWeighInModalOpen(false)}
       />
     </div>
   );

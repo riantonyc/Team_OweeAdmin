@@ -9,14 +9,12 @@ import { useToast } from "./Toast";
 interface HeaderProps {
   onOpenAddModal: () => void;
   onOpenExcelModal: () => void;
-  onOpenWeighInModal: () => void;
   onResetData: () => void;
 }
 
 export default function Header({
   onOpenAddModal,
   onOpenExcelModal,
-  onOpenWeighInModal,
   onResetData,
 }: HeaderProps) {
   const router = useRouter();
@@ -84,15 +82,6 @@ export default function Header({
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export Excel Book1 (.xlsx)</span>
             <span className="sm:hidden">Excel (.xlsx)</span>
-          </button>
-
-          <button
-            onClick={onOpenWeighInModal}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slateElevated hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-semibold text-xs sm:text-sm transition-all cursor-pointer min-h-[40px]"
-            title="Cetak Formulir Timbang Badan & Cek Medis"
-          >
-            <Printer className="w-4 h-4" />
-            <span className="hidden md:inline">Form Timbang</span>
           </button>
 
           <button

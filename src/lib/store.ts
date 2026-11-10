@@ -2,14 +2,11 @@ import fs from "fs";
 import path from "path";
 import { Athlete } from "./types";
 import { INITIAL_ATHLETES } from "./initialData";
-import { ClassBracket } from "./bracketUtils";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ATHLETES_FILE = path.join(DATA_DIR, "athletes.json");
-const BRACKETS_FILE = path.join(DATA_DIR, "brackets.json");
 
 let memoryAthletes: Athlete[] | null = null;
-let memoryBrackets: Record<string, ClassBracket> | null = null;
 
 function ensureDataDir(): void {
   try {
@@ -96,38 +93,4 @@ export async function resetAthletes(): Promise<Athlete[]> {
   const fresh = JSON.parse(JSON.stringify(INITIAL_ATHLETES));
   await saveAthletes(fresh);
   return fresh;
-}
-
-// ==========================================
-// TOURNAMENT BRACKETS CRUD
-// ==========================================
-export async function getBrackets(): Promise<Record<string, ClassBracket>> {
-  if (memoryBrackets) return memoryBrackets;
-  ensureDataDir();
-
-  try {
-    if (fs.existsSync(BRACKETS_FILE)) {
-      const content = fs.readFileSync(BRACKETS_FILE, "utf8");
-      memoryBrackets = JSON.parse(content);
-      return memoryBrackets!;
-    }
-  } catch (err) {
-    console.warn("Could not read brackets file, initializing empty:", err);
-  }
-
-  memoryBrackets = {};
-  return memoryBrackets;
-}
-
-export async function saveBracket(classKey: string, bracket: ClassBracket): Promise<void> {
-  const brackets = await getBrackets();
-  brackets[classKey] = bracket;
-  memoryBrackets = brackets;
-  ensureDataDir();
-
-  try {
-    fs.writeFileSync(BRACKETS_FILE, JSON.stringify(brackets, null, 2), "utf8");
-  } catch (err) {
-    console.warn("Could not write brackets file, cached in memory only.");
-  }
 }

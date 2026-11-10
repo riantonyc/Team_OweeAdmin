@@ -183,13 +183,7 @@ export default function TabBook1Classes({
                               <span className="text-slate-600">-</span>
                             )}
                           </td>
-                          <td
-                            className={`py-2.5 px-3 text-xs font-medium ${
-                              pa && (pa.kontingen === "Mempawah" || pa.kontingen === "Ketapang")
-                                ? "text-amber-300 font-semibold"
-                                : "text-slate-300"
-                            }`}
-                          >
+                          <td className="py-2.5 px-3 text-xs font-medium text-slate-300">
                             {pa ? pa.kontingen : ""}
                           </td>
                           <td className="py-2.5 px-2 text-center font-mono text-xs text-slate-300 tabular-nums">
@@ -222,13 +216,7 @@ export default function TabBook1Classes({
                               <span className="text-slate-600">-</span>
                             )}
                           </td>
-                          <td
-                            className={`py-2.5 px-3 text-xs font-medium ${
-                              pi && (pi.kontingen === "Mempawah" || pi.kontingen === "Ketapang")
-                                ? "text-amber-300 font-semibold"
-                                : "text-slate-300"
-                            }`}
-                          >
+                          <td className="py-2.5 px-3 text-xs font-medium text-slate-300">
                             {pi ? pi.kontingen : ""}
                           </td>
                           <td className="py-2.5 px-2 text-center font-mono text-xs text-slate-300 tabular-nums">

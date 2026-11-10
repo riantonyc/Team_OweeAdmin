@@ -547,7 +547,7 @@ export function exportAthletesToExcel(athletes: Athlete[], mode: "formula" | "st
         v: kCnt,
         t: "n",
         f: `COUNTIFS(Database_Atlet!$E$5:$E$200,$B${rNum},Database_Atlet!$C$5:$C$200,${colLetter}$3,Database_Atlet!$H$5:$H$200,"Aktif")`,
-        s: makeDataCellStyle(isEven, "center", kCnt > 0 && (kName === "Mempawah" || kName === "Ketapang")),
+        s: makeDataCellStyle(isEven, "center"),
       });
     });
 

@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, X, RotateCcw, LayoutGrid, Table as TableIcon, Eye, Edit3, Trash2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, X, RotateCcw, Eye, Edit3, Trash2 } from "lucide-react";
 import { Athlete } from "@/lib/types";
 import { KALBAR_CONTINGENTS, WEIGHT_CLASSES } from "@/lib/constants";
 import { formatDobIndo, calculateAge } from "@/lib/excelExport";
-import MobileAthleteCard from "./MobileAthleteCard";
 
 interface TabDatabaseProps {
   athletes: Athlete[];
+  contingentFilter?: string;
+  onContingentFilterChange?: (kontingen: string) => void;
   onOpenDetail: (id: number) => void;
   onOpenEdit: (id: number) => void;
   onDelete: (id: number) => void;
@@ -17,22 +18,31 @@ interface TabDatabaseProps {
 
 export default function TabDatabase({
   athletes,
+  contingentFilter = "ALL",
+  onContingentFilterChange,
   onOpenDetail,
   onOpenEdit,
   onDelete,
   onInlineUpdate,
 }: TabDatabaseProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterKontingen, setFilterKontingen] = useState("ALL");
+  const [filterKontingen, setFilterKontingen] = useState(contingentFilter);
   const [filterKelas, setFilterKelas] = useState("ALL");
   const [filterKategori, setFilterKategori] = useState("ALL");
   const [filterStatus, setFilterStatus] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("kelas");
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+
+  // Sinkronkan jika filter kontingen berubah dari luar (misal klik di Tab Rekap Matriks)
+  useEffect(() => {
+    if (contingentFilter !== undefined) {
+      setFilterKontingen(contingentFilter);
+    }
+  }, [contingentFilter]);
 
   const handleResetFilters = () => {
     setSearchQuery("");
     setFilterKontingen("ALL");
+    onContingentFilterChange?.("ALL");
     setFilterKelas("ALL");
     setFilterKategori("ALL");
     setFilterStatus("ALL");
@@ -114,7 +124,10 @@ export default function TabDatabase({
             </label>
             <select
               value={filterKontingen}
-              onChange={(e) => setFilterKontingen(e.target.value)}
+              onChange={(e) => {
+                setFilterKontingen(e.target.value);
+                onContingentFilterChange?.(e.target.value);
+              }}
               className="w-full px-3 py-2 rounded-lg bg-carbon border border-slateBorder text-xs sm:text-sm text-white focus:outline-none focus:border-byonBlueLight min-h-[40px]"
             >
               <option value="ALL">Semua Kontingen (14)</option>
@@ -188,44 +201,36 @@ export default function TabDatabase({
           </div>
         </div>
 
-        {/* Sub-bar: Showing counter, view mode toggle & sort order */}
+        {/* Sub-bar: Showing counter & sort order */}
         <div className="mt-3 pt-3 border-t border-slateBorder/60 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
-          <div>
-            Menampilkan <span className="font-bold text-white">{filtered.length}</span> dari {athletes.length} atlet
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>
+              Menampilkan <span className="font-bold text-white">{filtered.length}</span> dari {athletes.length} atlet
+            </span>
+            {filterKontingen !== "ALL" && (
+              <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30 text-[11px] flex items-center gap-1">
+                Kontingen: {filterKontingen}
+                <button
+                  onClick={() => {
+                    setFilterKontingen("ALL");
+                    onContingentFilterChange?.("ALL");
+                  }}
+                  className="hover:text-white ml-0.5 cursor-pointer"
+                  title="Hapus filter kontingen"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
-            {/* View Mode Toggle: Cards vs Table */}
-            <div className="inline-flex rounded-lg border border-slateBorder p-0.5 bg-carbon">
-              <button
-                onClick={() => setViewMode("cards")}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold transition-all ${
-                  viewMode === "cards"
-                    ? "bg-byonBlue text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                title="Tampilan Kartu (Optimal untuk HP)"
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Kartu</span>
-              </button>
-              <button
-                onClick={() => setViewMode("table")}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-semibold transition-all ${
-                  viewMode === "table"
-                    ? "bg-byonBlue text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
-                }`}
-                title="Tampilan Tabel Spreadsheet"
-              >
-                <TableIcon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Tabel</span>
-              </button>
-            </div>
-
+            <span className="text-[11px] text-slate-400 hidden sm:inline md:hidden">
+              👉 Geser tabel ke kanan untuk melihat seluruh kolom
+            </span>
             {/* Sort Dropdown */}
             <div className="flex items-center gap-1.5">
-              <span className="hidden sm:inline">Urut:</span>
+              <span>Urut:</span>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
@@ -241,7 +246,7 @@ export default function TabDatabase({
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content Area: Hanya Tabel Database */}
       {filtered.length === 0 ? (
         <div className="bg-slateCard border border-slateBorder rounded-xl p-12 text-center text-slate-400 space-y-2">
           <p className="text-base font-bold text-slate-300">
@@ -257,26 +262,14 @@ export default function TabDatabase({
             Reset Semua Filter
           </button>
         </div>
-      ) : viewMode === "cards" ? (
-        /* Mobile & Grid Card View (Optimal for Touch & Phone) */
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filtered.map((athlete, index) => (
-            <MobileAthleteCard
-              key={athlete.id}
-              athlete={athlete}
-              index={index}
-              onOpenDetail={onOpenDetail}
-              onOpenEdit={onOpenEdit}
-              onDelete={onDelete}
-              onInlineUpdate={onInlineUpdate}
-            />
-          ))}
-        </div>
       ) : (
-        /* Desktop Spreadsheet Table View */
         <div className="bg-slateCard border border-slateBorder rounded-xl overflow-hidden shadow-xl">
+          <div className="sm:hidden px-3 py-1.5 bg-slateElevated/60 border-b border-slateBorder text-[11px] text-slate-400 flex items-center justify-between">
+            <span>Tabel Database Atlet</span>
+            <span className="text-blue-400 font-medium">👉 Geser untuk melihat semua kolom</span>
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[760px] md:min-w-full">
               <thead>
                 <tr className="bg-slateElevated/80 border-b border-slateBorder text-[11px] font-extrabold uppercase tracking-wider text-slate-300">
                   <th className="py-3 px-3 text-center w-12">No</th>
@@ -425,4 +418,3 @@ export default function TabDatabase({
     </section>
   );
 }
-
