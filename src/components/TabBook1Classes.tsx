@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Plus } from "lucide-react";
+import { Download, Plus, FileSpreadsheet } from "lucide-react";
 import { Athlete } from "@/lib/types";
 import { WEIGHT_CLASSES } from "@/lib/constants";
 import { formatDobIndo } from "@/lib/excelExport";
+import ModalCustomClassExport from "./ModalCustomClassExport";
 
 interface TabBook1ClassesProps {
   athletes: Athlete[];
@@ -20,6 +21,7 @@ export default function TabBook1Classes({
   onOpenExcelModal,
 }: TabBook1ClassesProps) {
   const [selectedClass, setSelectedClass] = useState("ALL");
+  const [isCustomExportModalOpen, setIsCustomExportModalOpen] = useState(false);
 
   const classesToShow =
     selectedClass === "ALL"
@@ -60,12 +62,24 @@ export default function TabBook1Classes({
             ))}
           </select>
 
+          {/* Tombol Utama: Cetak / Export Excel 1 Sheet dengan Konfigurasi */}
+          <button
+            onClick={() => setIsCustomExportModalOpen(true)}
+            className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md cursor-pointer flex items-center gap-1.5 min-h-[40px] transition-all"
+            title="Buka Konfigurator Cetak Excel 1 Sheet (Bisa atur gabung putra-putri, per kontingen, dll)"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Cetak Excel 1 Sheet (Konfigurasi)</span>
+          </button>
+
+          {/* Tombol Sekunder: Export Master Book1 4 Sheet */}
           <button
             onClick={onOpenExcelModal}
-            className="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md cursor-pointer flex items-center gap-1.5 min-h-[40px]"
+            className="px-3 py-2 rounded-lg bg-slateElevated hover:bg-slate-700 text-slate-300 border border-slateBorder font-semibold text-xs sm:text-sm cursor-pointer flex items-center gap-1.5 min-h-[40px] transition-all"
+            title="Download File Master Excel Lengkap 4 Sheet"
           >
-            <Download className="w-4 h-4" />
-            <span>Download Excel Rapi</span>
+            <Download className="w-4 h-4 text-slate-400" />
+            <span className="hidden xl:inline">Master (4 Sheet)</span>
           </button>
         </div>
       </div>
@@ -258,7 +272,14 @@ export default function TabBook1Classes({
           );
         })}
       </div>
+
+      {/* Modal Konfigurator Excel 1 Sheet */}
+      <ModalCustomClassExport
+        isOpen={isCustomExportModalOpen}
+        athletes={athletes}
+        initialClass={selectedClass}
+        onClose={() => setIsCustomExportModalOpen(false)}
+      />
     </section>
   );
 }
-
