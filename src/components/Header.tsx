@@ -87,10 +87,10 @@ export default function Header({
           <button
             onClick={onResetData}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slateElevated hover:bg-slate-700 text-slate-300 border border-slateBorder font-medium text-xs sm:text-sm transition-all cursor-pointer min-h-[40px]"
-            title="Kembalikan ke 68 Atlet Awal"
+            title="Kembalikan ke 76 Atlet Awal"
           >
             <RotateCcw className="w-4 h-4 text-slate-400" />
-            <span className="hidden xl:inline">Reset (68 Atlet)</span>
+            <span className="hidden xl:inline">Reset (76 Atlet)</span>
           </button>
 
           {/* User Badge & Logout */}

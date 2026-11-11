@@ -429,7 +429,7 @@ export default function ModalCustomClassExport({
                             : "bg-slateElevated text-slate-400 hover:text-white border border-slateBorder/60"
                         }`}
                       >
-                        {c.replace("UNDER ", "U-")}
+                        {c.replace("KELAS ", "")}
                       </button>
                     );
                   })}

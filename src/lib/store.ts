@@ -2,6 +2,15 @@ import fs from "fs";
 import path from "path";
 import { Athlete } from "./types";
 import { INITIAL_ATHLETES } from "./initialData";
+import {
+  isDbConfigured,
+  getDbAthletes,
+  getDbAthleteById,
+  addDbAthlete,
+  updateDbAthlete,
+  deleteDbAthlete,
+  resetDbAthletes,
+} from "./db";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ATHLETES_FILE = path.join(DATA_DIR, "athletes.json");
@@ -19,10 +28,10 @@ function ensureDataDir(): void {
 }
 
 // ==========================================
-// ATHLETES CRUD
+// FILE/MEMORY FALLBACK HELPERS
 // ==========================================
-export async function getAthletes(): Promise<Athlete[]> {
-  if (memoryAthletes) return memoryAthletes;
+async function getFileAthletes(): Promise<Athlete[]> {
+  if (memoryAthletes && memoryAthletes.length > 0) return memoryAthletes;
   ensureDataDir();
 
   try {
@@ -39,10 +48,11 @@ export async function getAthletes(): Promise<Athlete[]> {
   }
 
   memoryAthletes = JSON.parse(JSON.stringify(INITIAL_ATHLETES));
+  await saveFileAthletes(memoryAthletes!);
   return memoryAthletes!;
 }
 
-export async function saveAthletes(athletes: Athlete[]): Promise<void> {
+async function saveFileAthletes(athletes: Athlete[]): Promise<void> {
   memoryAthletes = athletes;
   ensureDataDir();
 
@@ -53,44 +63,96 @@ export async function saveAthletes(athletes: Athlete[]): Promise<void> {
   }
 }
 
+// ==========================================
+// UNIFIED ATHLETES CRUD (POSTGRESQL + FALLBACK)
+// ==========================================
+export async function getAthletes(): Promise<Athlete[]> {
+  if (isDbConfigured) {
+    try {
+      return await getDbAthletes();
+    } catch (err) {
+      console.warn("PostgreSQL getAthletes failed, falling back to local file:", err);
+    }
+  }
+  return getFileAthletes();
+}
+
 export async function getAthleteById(id: number): Promise<Athlete | null> {
-  const list = await getAthletes();
+  if (isDbConfigured) {
+    try {
+      return await getDbAthleteById(id);
+    } catch (err) {
+      console.warn("PostgreSQL getAthleteById failed, falling back to local file:", err);
+    }
+  }
+  const list = await getFileAthletes();
   return list.find((a) => a.id === id) || null;
 }
 
 export async function addAthlete(data: Omit<Athlete, "id">): Promise<Athlete> {
-  const list = await getAthletes();
+  if (isDbConfigured) {
+    try {
+      return await addDbAthlete(data);
+    } catch (err) {
+      console.warn("PostgreSQL addAthlete failed, falling back to local file:", err);
+    }
+  }
+  const list = await getFileAthletes();
   const nextId = list.length > 0 ? Math.max(...list.map((a) => a.id)) + 1 : 1;
   const newAthlete: Athlete = { ...data, id: nextId };
   list.push(newAthlete);
-  await saveAthletes(list);
+  await saveFileAthletes(list);
   return newAthlete;
 }
 
-export async function updateAthlete(id: number, data: Partial<Omit<Athlete, "id">>): Promise<Athlete | null> {
-  const list = await getAthletes();
+export async function updateAthlete(
+  id: number,
+  data: Partial<Omit<Athlete, "id">>
+): Promise<Athlete | null> {
+  if (isDbConfigured) {
+    try {
+      return await updateDbAthlete(id, data);
+    } catch (err) {
+      console.warn("PostgreSQL updateAthlete failed, falling back to local file:", err);
+    }
+  }
+  const list = await getFileAthletes();
   const index = list.findIndex((a) => a.id === id);
   if (index === -1) return null;
 
   list[index] = { ...list[index], ...data };
-  await saveAthletes(list);
+  await saveFileAthletes(list);
   return list[index];
 }
 
 export async function deleteAthlete(id: number): Promise<boolean> {
-  const list = await getAthletes();
+  if (isDbConfigured) {
+    try {
+      return await deleteDbAthlete(id);
+    } catch (err) {
+      console.warn("PostgreSQL deleteAthlete failed, falling back to local file:", err);
+    }
+  }
+  const list = await getFileAthletes();
   const initialLength = list.length;
   const filtered = list.filter((a) => a.id !== id);
 
   if (filtered.length !== initialLength) {
-    await saveAthletes(filtered);
+    await saveFileAthletes(filtered);
     return true;
   }
   return false;
 }
 
 export async function resetAthletes(): Promise<Athlete[]> {
+  if (isDbConfigured) {
+    try {
+      return await resetDbAthletes();
+    } catch (err) {
+      console.warn("PostgreSQL resetAthletes failed, falling back to local file:", err);
+    }
+  }
   const fresh = JSON.parse(JSON.stringify(INITIAL_ATHLETES));
-  await saveAthletes(fresh);
+  await saveFileAthletes(fresh);
   return fresh;
 }

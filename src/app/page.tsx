@@ -129,9 +129,9 @@ export default function DashboardPage() {
     }
   };
 
-  // Handler: Reset to 68 athletes
+  // Handler: Reset to 76 athletes
   const handleResetToInitial = async () => {
-    if (!confirm("Kembalikan data ke 68 atlet awal resmi? Semua perubahan manual akan direset.")) {
+    if (!confirm("Kembalikan data ke 76 atlet awal resmi? Semua perubahan manual akan direset.")) {
       return;
     }
 
@@ -140,7 +140,7 @@ export default function DashboardPage() {
       const data = await res.json();
       if (data.success && data.athletes) {
         setAthletes(data.athletes);
-        showToast("Data atlet berhasil direset ke 68 atlet awal!", "success");
+        showToast("Data atlet berhasil direset ke 76 atlet awal!", "success");
       }
     } catch (err) {
       showToast("Gagal mereset data atlet.", "error");
